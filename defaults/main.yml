@@ -51,7 +51,7 @@ openssl_certs_dest_csr_path: "{{openssl_certs_dest_path}}/{{openssl_certs_csr_na
 # Data Storage for generated certificates
 #
 openssl_copy_to_store: true
-openssl_certs_store_path: "{{dynamic_data_store|default(playbook_dir)}}/files/openssl"
+openssl_certs_store_path: "{{dynamic_data_store|default(playbook_dir)}}/files/{{ansible_fqdn}}/openssl"
 openssl_certs_store_privkey_path: "{{openssl_certs_store_path}}/{{openssl_certs_privkey_name}}"
 openssl_certs_store_cert_path: "{{openssl_certs_store_path}}/{{openssl_certs_cert_name}}"
 openssl_certs_store_csr_path: "{{openssl_certs_store_path}}/{{openssl_certs_csr_name}}"

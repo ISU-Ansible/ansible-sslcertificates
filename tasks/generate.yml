@@ -15,17 +15,11 @@
       creates: "{{ openssl_certs_dest_cert_path }}
     when: openssl_certs_generate_self_signed
 
-  - name: SSLCERTIFICATES | GENERATE | Fetch SSL certificates
-    tags:
-      - ssl-certs
-      - configuration
-    fetch:
-      src: "{{item.src}}"
-      dest: "{{item.dest}}"
-    when:
-      - stat_privkey.stat.exists
-      - stat_cert.stat.exists
+  - fetch:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      flat: yes
     with_items:
-      - { src: "{{openssl_certs_dest_cert_path}}", dest: "{{openssl_certs_store_cert_path}}" }
-      - { src: "{{openssl_certs_dest_privkey_path}}", dest: "{{openssl_certs_store_privkey_path}}" }
-      - { src: "{{openssl_certs_dest_csr_path}}", dest: "{{openssl_certs_store_csr_path}}" }
+      - { src: "{{ openssl_certs_dest_cert_path }}", dest: "{{ openssl_certs_store_cert_path }}" }
+      - { src: "{{ openssl_certs_dest_privkey_path }}", dest: "{{ openssl_certs_store_privkey_path }}" }
+      - { src: "{{ openssl_certs_dest_csr_path }}", dest: "{{ openssl_certs_store_csr_path }}" }
