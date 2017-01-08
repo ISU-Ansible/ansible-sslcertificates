@@ -32,14 +32,12 @@
       group: "{{openssl_certs_dest_path_group}}"
       mode: "{{openssl_certs_dest_path_mode}}"
 
-  - local_action:
-      stat:
-        path: "{{openssl_certs_store_privkey_path}}"
+  - local_action: stat
+      path: "{{openssl_certs_store_privkey_path}}"
     register: local_stat_privkey
 
-  - local_action:
-      stat:
-        path: "{{openssl_certs_store_cert_path}}"
+  - local_action: stat
+      path: "{{openssl_certs_store_cert_path}}"
     register: local_stat_cert
 
   - include: generate.yml
