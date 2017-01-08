@@ -1,0 +1,31 @@
+---
+  - name: SSLCERTIFICATES | GENERATE | RSA Private key
+    command: openssl genrsa -out {{ openssl_certs_dest_privkey_path }} {{ openssl_certs_key_size }}
+    args:
+      creates: "{{ openssl_certs_dest_privkey_path }}"
+
+  - name: SSLCERTIFICATES | GENERATE | CSR
+    command: openssl req -new -sha256 -subj "{{ openssl_certs_fields }}" -key {{ openssl_certs_dest_privkey_path }} -out {{ openssl_certs_dest_csr_path }}
+    args:
+      creates: "{{ openssl_certs_dest_csr_path }}"
+
+  - name: SSLCERTIFICATES | GENERATE | Certificate
+    command: openssl req -nodes -x509 -days {{ openssl_certs_days }} -in {{ openssl_certs_dest_csr_path }} -key {{ openssl_certs_dest_privkey_path }} -out {{ openssl_certs_dest_cert_path }} -extensions v3_ca
+    args:
+      creates: "{{ openssl_certs_dest_cert_path }}
+    when: openssl_certs_generate_self_signed
+
+  - name: SSLCERTIFICATES | GENERATE | Fetch SSL certificates
+    tags:
+      - ssl-certs
+      - configuration
+    fetch:
+      src: "{{item.src}}"
+      dest: "{{item.dest}}"
+    when:
+      - stat_privkey.stat.exists
+      - stat_cert.stat.exists
+    with_items:
+      - { src: "{{openssl_certs_dest_cert_path}}", dest: "{{openssl_certs_store_cert_path}}" }
+      - { src: "{{openssl_certs_dest_privkey_path}}", dest: "{{openssl_certs_store_privkey_path}}" }
+      - { src: "{{openssl_certs_dest_csr_path}}", dest: "{{openssl_certs_store_csr_path}}" }

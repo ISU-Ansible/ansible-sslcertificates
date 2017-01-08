@@ -1,0 +1,63 @@
+---
+  - name: SSLCERTIFICATES | Include OS-specific variables.
+    tags:
+      - ssl-certs
+      - configuration
+    include_vars: "{{item}}"
+    with_first_found:
+      - "{{ansible_distribution}}_{{ansible_distribution_major_version}}_{{ansible_distribution_minor_version}}.yml"
+      - "{{ansible_distribution}}_{{ansible_distribution_major_version}}.yml"
+      - "{{ansible_distribution}}.yml"
+      - "{{ansible_os_family}}_{{ansible_distribution_major_version}}_{{ansible_distribution_minor_version}}.yml"
+      - "{{ansible_os_family}}_{{ansible_distribution_major_version}}.yml"
+      - "{{ansible_os_family}}.yml"
+      - default.yml
+
+  - name: SSLCERTIFICATES | Ensure OpenSSL is installed
+    tags:
+      - ssl-certs
+      - configuration
+    package:
+      name: "{{openssl_package_name}}"
+      state: present
+
+  - name: SSLCERTIFICATES | Ensure destination folder exists
+    tags:
+      - ssl-certs
+      - configuration
+    file:
+      path: "{{openssl_certs_dest_path}}"
+      state: directory
+      owner: "{{openssl_certs_dest_path_owner}}"
+      group: "{{openssl_certs_dest_path_group}}"
+      mode: "{{openssl_certs_dest_path_mode}}"
+
+  - local_action:
+      stat:
+        path: "{{openssl_certs_store_privkey_path}}"
+    register: local_stat_privkey
+
+  - local_action:
+      stat:
+        path: "{{openssl_certs_store_cert_path}}"
+    register: local_stat_cert
+
+  - include: generate.yml
+    tags:
+      - ssl-certs
+      - configuration
+    when:
+      - not local_stat_privkey.stat.exists
+      - not local_stat_cert.stat.exists
+
+  - name: SSLCERTIFICATES | Copy certificates to destination
+    copy:
+      src: "{{item.src}}"
+      dest: "{{item.dest}}"
+      owner: "{{openssl_certs_dest_path_owner}}"
+      group: "{{openssl_certs_dest_path_group}}"
+      mode: "{{openssl_certs_dest_path_mode}}"
+    with_items:
+      - { src: "{{openssl_certs_store_privkey_path}}", dest: "{{openssl_certs_dest_privkey_path}}" }
+      - { src: "{{openssl_certs_store_cert_path}}", dest: "{{openssl_certs_dest_cert_path}}" }
+      - { src: "{{openssl_certs_store_csr_path}}", dest: "{{openssl_certs_dest_csr_path}}" }
