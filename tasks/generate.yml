@@ -10,12 +10,13 @@
       creates: "{{ openssl_certs_dest_csr_path }}"
 
   - name: SSLCERTIFICATES | GENERATE | Certificate
-    command: openssl req -nodes -x509 -days {{ openssl_certs_days }} -in {{ openssl_certs_dest_csr_path }} -key {{ openssl_certs_dest_privkey_path }} -out {{ openssl_certs_dest_cert_path }} -extensions v3_ca
+    command: openssl req -nodes -x509 -days {{ openssl_certs_days }} -in {{ openssl_certs_dest_csr_path }} -key {{ openssl_certs_dest_privkey_path }} -out {{ openssl_certs_dest_cert_path }} -extensions v3_ca"
     args:
-      creates: "{{ openssl_certs_dest_cert_path }}
+      creates: "{{ openssl_certs_dest_cert_path }}"
     when: openssl_certs_generate_self_signed
 
-  - fetch:
+  - name: SSLCERTIFICATES | GENERATE | Fetch SSL certificates
+    fetch:
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
       flat: yes

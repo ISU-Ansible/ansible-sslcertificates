@@ -4,7 +4,6 @@
 
   vars:
     dynamic_data_store: "/tmp"
-
     openssl_certs_country: "US"
     openssl_certs_locality: "TestCity"
     openssl_certs_organization: "TestOrg"
