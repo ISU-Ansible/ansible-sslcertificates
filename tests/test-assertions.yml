@@ -1,0 +1,27 @@
+---
+- hosts: localhost
+  remote_user: root
+
+  roles:
+    - role_under_test
+
+  tasks:
+
+    - name: "[Test] Does the private key exist"
+      local_action: stat path="{{ openssl_certs_store_cert_path }}"
+      register: stat_cert
+
+    - name: "[Test] Does the private key exist"
+      local_action: stat path="{{ openssl_certs_store_privkey_path }}"
+      register: stat_privkey
+
+    - debug:
+        var: stat_cert
+
+    - debug:
+        var: stat_privkey
+
+    - assert:
+        that:
+         - 'stat_cert.stat.exists'
+         - 'stat_privkey.stat.exists'
